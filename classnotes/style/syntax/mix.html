@@ -4,56 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hello CSS</title>
+    <link rel="stylesheet" href="./css/lib.css" />
+    <link rel="stylesheet" href="./css/style.css" />
     <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
       h1 {
-        text-align: center;
-        font-style: italic;
-      }
-
-      p,
-      h1 {
-        color: seagreen;
-      }
-
-      span {
-        font-weight: bold;
-      }
-
-      #company-name {
         color: red;
-      }
-
-      .fw-bold {
-        font-weight: bold;
-      }
-
-      .text-center {
-        text-align: center;
-      }
-
-      .fst-italic {
-        font-style: italic;
-      }
-
-      .text-blue {
-        color: blue;
-      }
-
-      .text-red {
-        color: red;
-      }
-
-      .text-white {
-        color: white;
-      }
-
-      .bg-black {
-        background-color: black;
       }
     </style>
   </head>
   <body>
-    <h1>Hello CSS</h1>
+    <h1 style="color: blue">Hello CSS</h1>
 
     <p class="fw-bold">
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod voluptatum
@@ -71,5 +35,19 @@
       officiis voluptates distinctio commodi, optio possimus dolores cupiditate
       ex officia ab ipsum itaque doloribus nostrum ea sed ut. Est, architecto.
     </p>
+    <div class="fw-bold">
+      <p class="fw-normal">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus sed,
+        ab ullam necessitatibus nemo architecto est, eveniet cum itaque deleniti
+        iure magni reprehenderit excepturi incidunt fugit sunt! Consequuntur,
+        dolorem officiis?
+      </p>
+      <p>
+        Voluptatem exercitationem nulla a temporibus quos similique,
+        perspiciatis, in laudantium dolorem qui, fugiat atque sapiente unde
+        corporis rerum ab asperiores earum quis ducimus perferendis vitae sed?
+        Molestiae consectetur deleniti unde?
+      </p>
+    </div>
   </body>
 </html>

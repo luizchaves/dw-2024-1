@@ -1,0 +1,31 @@
+.text-center {
+  text-align: center;
+}
+
+.fw-bold {
+  font-weight: bold;
+}
+
+.fw-normal {
+  font-weight: normal;
+}
+
+.fst-italic {
+  font-style: italic;
+}
+
+.text-blue {
+  color: blue;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-white {
+  color: white;
+}
+
+.bg-black {
+  background-color: black;
+}
