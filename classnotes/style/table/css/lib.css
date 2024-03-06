@@ -1,0 +1,32 @@
+.table-bordered,
+.table-bordered td,
+.table-bordered th {
+  border: 1px solid rgb(0, 0, 0);
+  padding: 0.2rem 0.5rem;
+}
+
+.table-bordered {
+  border-collapse: collapse;
+}
+
+.table-striped tbody tr:nth-child(2n + 1) {
+  background-color: rgb(230, 230, 230);
+}
+
+.table-striped {
+  border-collapse: collapse;
+}
+
+.table-striped thead {
+  border-bottom: 2px solid rgb(0, 0, 0);
+}
+
+.table-striped th {
+  text-align: left;
+}
+
+.table-striped,
+.table-striped td,
+.table-striped th {
+  padding: 0.2rem 0.5rem;
+}
