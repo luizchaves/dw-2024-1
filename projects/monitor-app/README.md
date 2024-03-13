@@ -26,4 +26,4 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 
 ## Layout
 
-As telas do projeto estão disponíveis [neste projeto](https://figma.com/file/3rWtag6oLh0amk2wS0XQH1/monitor-app) do Figma.
+As telas do projeto estão disponíveis [neste projeto](https://figma.com/file/3rWtag6oLh0amk2wS0XQH1/monitor-app) do Figma. Enquanto que o preview do projeto pode ser visto no GitHub Pages: [home](https://lucachaves.github.io/dw-2024-1/projects/monitor-app/front)/, [Login](https://lucachaves.github.io/dw-2024-1/projects/monitor-app/front/signin.html), [Cadastro de usuário](https://lucachaves.github.io/dw-2024-1/projects/monitor-app/front/signup.html).
