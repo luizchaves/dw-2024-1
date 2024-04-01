@@ -73,6 +73,23 @@ for (let flag = 0; flag < 10; flag++) {
 // 10, 11, ..., 19
 // ...
 // 90, 91, ... 99
+let result = '';
+
+for (let flag = 0; flag < 100; flag++) {
+  if (flag < 10) {
+    result += '0' + flag;
+  } else {
+    result += flag;
+  }
+
+  if (flag % 10 === 9) {
+    result += '\n';
+  } else {
+    result += ', ';
+  }
+}
+
+console.log(result);
 
 // 90, 91, ... 99
 // ...
@@ -80,3 +97,12 @@ for (let flag = 0; flag < 10; flag++) {
 // 00, 01, ..., 09
 
 // for for
+result = '';
+
+for (let decimal = 0; decimal < 10; decimal++) {
+  for (let unit = 0; unit < 10; unit++) {
+    result += `${decimal}${unit}`;
+  }
+}
+
+console.log(result);
