@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Script Tag</title>
+    <style>
+      .text-center {
+        text-align: center;
+      }
+    </style>
+    <script>
+      const name = 'IPFB';
+    </script>
+  </head>
+  <body>
+    <!-- https://cdnjs.com/libraries/mathjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.2/math.js"></script>
+    <script src="js/lib/hello.js"></script>
+    <script src="js/lib/math.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      console.log(name);
+      document.write(`<h1 class="text-center">${hello(name)}</h1>`);
+    </script>
+  </body>
+</html>
