@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Hosts</h1>
+    <ul></ul>
+    <script>
+      // data
+      const hosts = [
+        {
+          address: '192.168.0.1',
+        },
+        {
+          address: '192.168.0.2',
+        },
+      ];
+
+      // Get tag <ul> (empty)
+      const list = document.querySelector('ul');
+
+      // Generate items from data (<li>)
+      let items = '';
+
+      for (const host of hosts) {
+        items += `<li>${host.address}</li>`;
+      }
+
+      // Insert text
+      list.innerHTML = items;
+    </script>
+  </body>
+</html>
