@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Host List</title>
+  </head>
+  <body>
+    <h1>Host</h1>
+    <input type="text" placeholder="Digite um host" autofocus />
+    <button onclick="handleClick()">Add</button>
+    <ul></ul>
+    <script>
+      function handleClick() {
+        // Get value of input
+        const input = document.querySelector('input');
+
+        // Create list item
+        const item = `<li>${input.value}</li>`;
+
+        // Insert item on list
+        const list = document.querySelector('ul');
+
+        // list.innerHTML += item;
+        list.insertAdjacentHTML('afterbegin', item);
+
+        // clean value of input
+        input.value = '';
+
+        // focus on input
+        input.focus();
+      }
+    </script>
+  </body>
+</html>
