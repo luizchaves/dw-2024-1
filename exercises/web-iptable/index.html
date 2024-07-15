@@ -13,55 +13,65 @@
   </head>
   <body>
     <h1 class="text-center my-5">IP Table</h1>
-    <table class="table w-50 m-auto">
-      <thead class="table-dark">
-        <tr>
-          <th>IP</th>
-          <th>Mask</th>
-          <th>Version</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- <tr>
-          <td>192.168.0.1</td>
-          <td>255.255.255.0</td>
-          <td>v4</td>
-        </tr>
-        <tr>
-          <td>192.168.0.1</td>
-          <td>255.255.255.0</td>
-          <td>v4</td>
-        </tr>
-        <tr>
-          <td>192.168.0.1</td>
-          <td>255.255.255.0</td>
-          <td>v4</td>
-        </tr>
-        <tr>
-          <td>192.168.0.1</td>
-          <td>255.255.255.0</td>
-          <td>v4</td>
-        </tr>
-        <tr>
-          <td>192.168.0.1</td>
-          <td>255.255.255.0</td>
-          <td>v4</td>
-        </tr> -->
-      </tbody>
-    </table>
+
+    <section class="w-75 m-auto">
+      <form
+        class="row row-cols-lg-auto g-3 align-items-center justify-content-center"
+      >
+        <div>
+          <input
+            type="text"
+            class="form-control"
+            id="address"
+            name="address"
+            placeholder="IP"
+            autofocus
+          />
+        </div>
+        <div>
+          <input
+            type="text"
+            class="form-control"
+            id="mask"
+            name="mask"
+            placeholder="Mask"
+          />
+        </div>
+        <div>
+          <input
+            type="text"
+            class="form-control"
+            id="version"
+            name="version"
+            placeholder="Version"
+          />
+        </div>
+        <div>
+          <input type="submit" class="btn btn-dark" id="submit" value="Add" />
+        </div>
+      </form>
+
+      <table class="table mt-4">
+        <thead class="table-dark">
+          <tr>
+            <th>IP</th>
+            <th>Mask</th>
+            <th>Version</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
     <script type="module">
-      import { hosts } from './js/data.js';
+      function addHostRow(host) {
+        const tbody = document.querySelector('tbody');
 
-      localStorage.setItem('hosts', JSON.stringify(hosts));
-
-      const tbody = document.querySelector('tbody');
-
-      for (const host of JSON.parse(localStorage.getItem('hosts'))) {
         const tableRow = `<tr>
           <td>${host.address}</td>
           <td>${host.mask}</td>
@@ -70,6 +80,36 @@
 
         tbody.insertAdjacentHTML('beforeend', tableRow);
       }
+
+      function readHostsLS() {
+        const hosts = JSON.parse(localStorage.getItem('hosts'));
+
+        return hosts || [];
+      }
+
+      function addHostLS(host) {
+        const hosts = readHostsLS();
+
+        hosts.push(host);
+
+        localStorage.setItem('hosts', JSON.stringify(hosts));
+      }
+
+      const form = document.querySelector('form');
+
+      for (const host of readHostsLS()) {
+        addHostRow(host);
+      }
+
+      form.onsubmit = (event) => {
+        event.preventDefault();
+
+        const host = Object.fromEntries(new FormData(form));
+
+        addHostRow(host);
+
+        addHostLS(host);
+      };
     </script>
   </body>
 </html>
