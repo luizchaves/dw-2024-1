@@ -1,4 +1,5 @@
 @domain=http://localhost:3000
+@createdHostId={{createHost.response.body.$.id}}
 
 ### read hosts
 
@@ -9,7 +10,7 @@ GET {{domain}}/hosts
 GET {{domain}}/hosts/1
 
 ### create a host
-
+# @name createHost
 POST {{domain}}/hosts
 Content-Type: application/json
 
@@ -21,7 +22,7 @@ Content-Type: application/json
 
 ### update a host
 
-PUT {{domain}}/hosts/57bb
+PUT {{domain}}/hosts/{{createdHostId}}
 Content-Type: application/json
 
 {
@@ -32,4 +33,4 @@ Content-Type: application/json
 
 ### delete a host
 
-DELETE {{domain}}/hosts/57bb
+DELETE {{domain}}/hosts/{{createdHostId}}
