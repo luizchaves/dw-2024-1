@@ -81,23 +81,35 @@
         tbody.insertAdjacentHTML('beforeend', tableRow);
       }
 
-      function readHostsLS() {
-        const hosts = JSON.parse(localStorage.getItem('hosts'));
+      async function readHosts() {
+        const response = await fetch('http://localhost:3000/hosts');
 
-        return hosts || [];
+        const hosts = await response.json();
+
+        return hosts;
       }
 
-      function addHostLS(host) {
-        const hosts = readHostsLS();
+      async function addHost(host) {
+        const options = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'post',
+          body: JSON.stringify(host),
+        };
 
-        hosts.push(host);
+        const response = await fetch('http://localhost:3000/hosts', options);
 
-        localStorage.setItem('hosts', JSON.stringify(hosts));
+        const newHost = await response.json();
+
+        return newHost;
       }
 
       const form = document.querySelector('form');
 
-      for (const host of readHostsLS()) {
+      const hosts = await readHosts();
+
+      for (const host of hosts) {
         addHostRow(host);
       }
 
@@ -108,7 +120,7 @@
 
         addHostRow(host);
 
-        addHostLS(host);
+        addHost(host);
       };
     </script>
   </body>
