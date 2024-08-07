@@ -1,0 +1,35 @@
+@domain=http://localhost:3000
+
+### read hosts
+
+GET {{domain}}/hosts
+
+### read a host by id
+
+GET {{domain}}/hosts/1
+
+### create a host
+
+POST {{domain}}/hosts
+Content-Type: application/json
+
+{
+  "address": "192.168.0.6",
+  "mask": "255.255.255.0",
+  "version": "v4"
+}
+
+### update a host
+
+PUT {{domain}}/hosts/57bb
+Content-Type: application/json
+
+{
+  "address": "192.168.0.10",
+  "mask": "255.255.255.0",
+  "version": "v4"
+}
+
+### delete a host
+
+DELETE {{domain}}/hosts/57bb
