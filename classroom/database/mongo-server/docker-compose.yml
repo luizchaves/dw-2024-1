@@ -33,9 +33,6 @@ services:
     depends_on:
       - mongo
 
-volumes:
-  mongodb_data:
-
 networks:
   app-tier:
     driver: bridge
