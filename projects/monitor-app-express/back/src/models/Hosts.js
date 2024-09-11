@@ -1,84 +1,121 @@
-import { v4 as uuidv4 } from 'uuid';
-import { hosts } from '../database/data.js';
+import Database from '../database/database.js';
 
-function create({ name, address, id }) {
-  id = id ?? uuidv4();
+async function create({ name, address }) {
+  const db = await Database.connect();
 
-  if (!name || !address) {
-    throw new Error('Error when passing parameters');
-  }
+  const sql = `
+      INSERT INTO
+        hosts (name, address)
+      VALUES
+        (?, ?)
+    `;
 
-  const newHost = { name, address, id };
+  const { lastID } = await db.run(sql, [name, address]);
 
-  hosts.push(newHost);
+  db.close();
 
-  return newHost;
+  return await readById(lastID);
 }
 
-function read(where) {
+async function read(where) {
+  const db = await Database.connect();
+
   if (where) {
     const field = Object.keys(where)[0];
 
     const value = where[field];
 
-    const filteredHosts = hosts.filter((host) =>
-      host[field] instanceof String
-        ? host[field].toLowerCase().includes(value.toLowerCase())
-        : host[field] === value
-    );
+    const sql = `
+      SELECT
+          *
+        FROM
+          hosts
+        WHERE
+          ${field} LIKE CONCAT( '%',?,'%')
+      `;
 
-    return filteredHosts;
+    const hosts = await db.all(sql, [value]);
+
+    db.close();
+
+    return hosts;
   }
+
+  const sql = `
+    SELECT
+      *
+    FROM
+      hosts
+  `;
+
+  const hosts = await db.all(sql);
+
+  db.close();
 
   return hosts;
 }
 
-function readById(id) {
-  if (!id) {
-    throw new Error('Unable to find host');
-  }
+async function readById(id) {
+  const db = await Database.connect();
 
-  const index = hosts.findIndex((host) => host.id === id);
+  const sql = `
+      SELECT
+          *
+        FROM
+          hosts
+        WHERE
+          id = ?
+      `;
 
-  if (!hosts[index]) {
-    throw new Error('Host not found');
-  }
+  const host = await db.get(sql, [id]);
 
-  return hosts[index];
+  db.close();
+
+  return host;
 }
 
-function update({ id, name, address }) {
-  if (!name || !address || !id) {
-    throw new Error('Error when passing parameters');
-  }
+async function update({ id, name, address }) {
+  const db = await Database.connect();
 
-  const index = hosts.findIndex((host) => host.id === id);
+  const sql = `
+      UPDATE
+        hosts
+      SET
+        name = ?, address = ?
+      WHERE
+        id = ?
+    `;
 
-  if (!hosts[index]) {
+  const { changes } = await db.run(sql, [name, address, id]);
+
+  db.close();
+
+  if (changes === 1) {
+    return readById(id);
+  } else {
     throw new Error('Host not found');
   }
-
-  const newHost = { name, address, id };
-
-  hosts[index] = newHost;
-
-  return newHost;
 }
 
-function remove(id) {
-  if (!id) {
-    throw new Error('Unable to find host');
-  }
+async function remove(id) {
+  const db = await Database.connect();
 
-  const index = hosts.findIndex((host) => host.id === id);
+  const sql = `
+    DELETE FROM
+      hosts
+    WHERE
+      id = ?
+  `;
 
-  if (!hosts[index]) {
+  const { changes } = await db.run(sql, [id]);
+
+  db.close();
+
+  if (changes === 1) {
+    return true;
+  } else {
     throw new Error('Host not found');
   }
-
-  hosts.splice(index, 1);
-
-  return true;
 }
 
 export default { create, read, readById, update, remove };
