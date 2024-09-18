@@ -35,31 +35,45 @@
     <div class="container">
       <h1 class="text-center m-0 p-5">Monitor App</h1>
 
-      <div class="card table-hosts">
-        <div class="card-header">
-          <h5 class="text-center">
-            Hosts
-            <div
-              class="float-end create-host-event lh-base"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#offcanvasRight"
-              aria-controls="offcanvasRight"
-            >
-              <iconify-icon icon="bx:plus"></iconify-icon>
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col">
+          <div class="card table-hosts">
+            <div class="card-header">
+              <h5 class="text-center">
+                Hosts
+                <div
+                  class="float-end create-host-event lh-base"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasRight"
+                  aria-controls="offcanvasRight"
+                >
+                  <iconify-icon icon="bx:plus"></iconify-icon>
+                </div>
+              </h5>
             </div>
-          </h5>
+            <div class="card-body">
+              <table class="table table-hosts">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Endereço</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <table class="table table-hosts">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Endereço</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="text-center">Times</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="chart-line"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>

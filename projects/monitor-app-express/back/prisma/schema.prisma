@@ -5,13 +5,61 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// generator erd {
+//   provider = "prisma-erd-generator"
+// }
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+model Tag {
+  id    String        @id @default(uuid())
+  name  String        @unique
+  hosts TagsOnHosts[]
+}
+
 model Host {
-  id      String @id @default(cuid())
+  id      String        @id @default(uuid())
   name    String
   address String
+  pings   Ping[]
+  tags    TagsOnHosts[]
+}
+
+model TagsOnHosts {
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tagId  String
+  host   Host   @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hostId String
+
+  @@id([tagId, hostId])
+}
+
+model Ping {
+  id       String   @id @default(uuid())
+  createAt DateTime @default(now())
+  host     Host     @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hostId   String
+  icmps    Icmp[]
+  stats    Stats?
+}
+
+model Stats {
+  id          String @id @default(uuid())
+  transmitted Int
+  received    Int
+  time        Float
+  ping        Ping   @relation(fields: [pingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pingId      String @unique
+}
+
+model Icmp {
+  id     String @id @default(uuid())
+  seq    Int
+  ttl    Int
+  time   Float
+  ping   Ping   @relation(fields: [pingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pingId String
 }

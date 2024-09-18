@@ -1,21 +1,68 @@
 import prisma from '../database/database.js';
 
-async function create({ name, address }) {
+async function create({ id, name, address, tags }) {
+  const data = id ? { id, name, address } : { name, address };
+
+  if (tags?.length) {
+    data.tags = {
+      create: tags.map((tag) => ({
+        tag: {
+          connectOrCreate: {
+            where: {
+              name: tag,
+            },
+            create: {
+              name: tag,
+            },
+          },
+        },
+      })),
+    };
+  }
+
   const createdHost = await prisma.host.create({
-    data: { name, address },
+    data,
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
   });
 
   return createdHost;
 }
 
-async function read(where) {
+async function read(where = {}) {
   if (where?.name) {
     where.name = {
       contains: where.name,
     };
   }
 
-  const hosts = await prisma.host.findMany({ where });
+  if (where?.tags) {
+    where.tags = {
+      some: {
+        tag: {
+          name: {
+            contains: where.tags,
+          },
+        },
+      },
+    };
+  }
+
+  const hosts = await prisma.host.findMany({
+    where,
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
+  });
 
   if (hosts.length === 1 && where) {
     return hosts[0];
@@ -29,17 +76,50 @@ async function readById(id) {
     where: {
       id,
     },
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
   });
 
   return host;
 }
 
-async function update({ id, name, address }) {
+async function update({ id, name, address, tags }) {
+  const data = { id, name, address };
+
+  if (tags?.length) {
+    data.tags = {
+      create: tags.map((tag) => ({
+        tag: {
+          connectOrCreate: {
+            where: {
+              name: tag,
+            },
+            create: {
+              name: tag,
+            },
+          },
+        },
+      })),
+    };
+  }
+
   const updatedHost = await prisma.host.update({
     where: {
       id,
     },
-    data: { name, address },
+    data,
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
   });
 
   return updatedHost;

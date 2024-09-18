@@ -1,19 +1,22 @@
-import { resolve } from 'node:path';
-import { readFileSync } from 'node:fs';
 import { PrismaClient } from '@prisma/client';
+import Host from '../src/models/Hosts.js';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const file = resolve('prisma', 'seeders.json');
+  await Host.create({
+    id: 'e4cfb6bb-4431-42a9-b660-d5701b2f49cd',
+    name: 'Google DNS',
+    address: '8.8.8.8',
+    tags: ['DNS', 'Google'],
+  });
 
-  const seed = JSON.parse(readFileSync(file));
-
-  for (const host of seed.hosts) {
-    await prisma.host.create({
-      data: host,
-    });
-  }
+  await Host.create({
+    id: 'a2bb615a-6153-41bf-8cbe-0bfb538ce511',
+    name: 'Google Search',
+    address: 'www.google.com',
+    tags: ['Motor de Busca', 'Google'],
+  });
 }
 main()
   .then(async () => {
