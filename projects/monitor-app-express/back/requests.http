@@ -1,86 +1,7 @@
 @server=http://localhost:3000
 @createdHostId = {{createHost.response.body.$.id}}
 @createdUserId = {{createdUser.response.body.$.id}}
-
-### Create a host
-# @name createHost
-POST {{server}}/hosts
-Content-Type: application/json
-
-{
-  "name": "DNS Server",
-  "address": "1.1.1.1"
-}
-
-### Create a host without name or address
-POST {{server}}/hosts
-Content-Type: application/json
-
-{
-  "name": "DNS Server"
-}
-
-### Read hosts
-GET {{server}}/hosts
-
-### Read a host by name
-GET {{server}}/hosts?name=Google%20DNS
-# GET {{server}}/hosts?name=DNS
-# GET {{server}}/hosts?name=dns
-
-### Read a host by id
-GET {{server}}/hosts/{{createdHostId}}
-
-### Read a host by id with invalid id
-GET {{server}}/hosts/x
-
-### Update a host
-PUT {{server}}/hosts/{{createdHostId}}
-Content-Type: application/json
-
-{
-  "name": "Cloudflare DNS",
-  "address": "1.1.1.1",
-  "tags": [ "DNS", "Cloudflare"]
-}
-
-### Update a host without name or address
-PUT {{server}}/hosts/{{createdHostId}}
-Content-Type: application/json
-
-{
-  "name": "Cloudflare DNS"
-}
-
-### Update a host with invalid id
-PUT {{server}}/hosts/x
-Content-Type: application/json
-
-{
-  "name": "Cloudflare DNS",
-  "address": "1.1.1.1"
-}
-
-### Delete a host
-DELETE {{server}}/hosts/{{createdHostId}}
-
-### Delete a host with invalid id
-DELETE {{server}}/hosts/x
-
-### Create a ping
-POST {{server}}/hosts/{{createdHostId}}/pings/3
-
-### Read pings
-GET {{server}}/hosts/{{createdHostId}}/pings
-
-### Read tags
-GET {{server}}/tags
-
-### Read hosts by tag
-GET {{server}}/tags/dns/hosts
-
-### Read pings
-GET {{server}}/pings
+@token = {{signin.response.body.$.token}}
 
 ### Create User
 # @name createdUser
@@ -112,3 +33,131 @@ Content-Type: application/json
   "email": "luiz@email.com",
   "password": "123"
 }
+
+### Signin
+# @name signin
+POST {{server}}/signin
+Content-Type: application/json
+
+{
+  "email": "luiz@email.com",
+  "password": "123"
+}
+
+### Read current user
+GET {{server}}/users/me
+Authorization: bearer {{token}}
+
+### Signin 401
+POST {{server}}/signin
+Content-Type: application/json
+
+{
+  "email": "luiz@email.com",
+  "password": "321"
+}
+
+### Create a host without login
+POST {{server}}/hosts
+Content-Type: application/json
+
+{
+  "name": "DNS Server",
+  "address": "1.1.1.1"
+}
+
+### Create a host
+# @name createHost
+POST {{server}}/hosts
+Authorization: bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "DNS Server",
+  "address": "1.1.1.1"
+}
+
+### Create a host without name or address
+POST {{server}}/hosts
+Authorization: bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "DNS Server"
+}
+
+### Read hosts
+GET {{server}}/hosts
+Authorization: bearer {{token}}
+
+### Read a host by name
+GET {{server}}/hosts?name=Google%20DNS
+# GET {{server}}/hosts?name=DNS
+# GET {{server}}/hosts?name=dns
+Authorization: bearer {{token}}
+
+### Read a host by id
+GET {{server}}/hosts/{{createdHostId}}
+Authorization: bearer {{token}}
+
+### Read a host by id with invalid id
+GET {{server}}/hosts/x
+Authorization: bearer {{token}}
+
+### Update a host
+PUT {{server}}/hosts/{{createdHostId}}
+Authorization: bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Cloudflare DNS",
+  "address": "1.1.1.1",
+  "tags": [ "DNS", "Cloudflare"]
+}
+
+### Update a host without name or address
+PUT {{server}}/hosts/{{createdHostId}}
+Authorization: bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Cloudflare DNS"
+}
+
+### Update a host with invalid id
+PUT {{server}}/hosts/x
+Authorization: bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Cloudflare DNS",
+  "address": "1.1.1.1"
+}
+
+### Delete a host
+DELETE {{server}}/hosts/{{createdHostId}}
+Authorization: bearer {{token}}
+
+### Delete a host with invalid id
+DELETE {{server}}/hosts/x
+Authorization: bearer {{token}}
+
+### Create a ping
+POST {{server}}/hosts/{{createdHostId}}/pings/3
+Authorization: bearer {{token}}
+
+### Read pings
+GET {{server}}/hosts/{{createdHostId}}/pings
+Authorization: bearer {{token}}
+
+### Read tags
+GET {{server}}/tags
+Authorization: bearer {{token}}
+
+### Read hosts by tag
+GET {{server}}/tags/dns/hosts
+Authorization: bearer {{token}}
+
+### Read pings
+GET {{server}}/pings
+Authorization: bearer {{token}}

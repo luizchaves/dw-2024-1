@@ -1,9 +1,15 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
 import Host from './models/Hosts.js';
 import Ping from './models/Pings.js';
 import Tag from './models/Tags.js';
 import User from './models/Users.js';
+
 import { ping } from './lib/ping.js';
+
+import { isAuthenticated } from './middleware/auth.js';
 
 class HttpError extends Error {
   constructor(message, code = 400) {
@@ -14,7 +20,7 @@ class HttpError extends Error {
 
 const router = express.Router();
 
-router.post('/hosts', async (req, res) => {
+router.post('/hosts', isAuthenticated, async (req, res) => {
   const { name, address, tags } = req.body;
 
   if (!name || !address) {
@@ -30,7 +36,7 @@ router.post('/hosts', async (req, res) => {
   }
 });
 
-router.get('/hosts', async (req, res) => {
+router.get('/hosts', isAuthenticated, async (req, res) => {
   const { name } = req.query;
 
   try {
@@ -48,7 +54,7 @@ router.get('/hosts', async (req, res) => {
   }
 });
 
-router.get('/hosts/:id', async (req, res) => {
+router.get('/hosts/:id', isAuthenticated, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -64,7 +70,7 @@ router.get('/hosts/:id', async (req, res) => {
   }
 });
 
-router.put('/hosts/:id', async (req, res) => {
+router.put('/hosts/:id', isAuthenticated, async (req, res) => {
   const { name, address, tags } = req.body;
 
   const { id } = req.params;
@@ -82,7 +88,7 @@ router.put('/hosts/:id', async (req, res) => {
   }
 });
 
-router.delete('/hosts/:id', async (req, res) => {
+router.delete('/hosts/:id', isAuthenticated, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -94,25 +100,29 @@ router.delete('/hosts/:id', async (req, res) => {
   }
 });
 
-router.post('/hosts/:hostId/pings/:count', async (req, res) => {
-  const { hostId, count } = req.params;
+router.post(
+  '/hosts/:hostId/pings/:count',
+  isAuthenticated,
+  async (req, res) => {
+    const { hostId, count } = req.params;
 
-  try {
-    const userId = (await User.read())[0].id;
+    try {
+      const userId = req.userId;
 
-    const host = await Host.readById(hostId);
+      const host = await Host.readById(hostId);
 
-    const pingResult = await ping(host.address, count);
+      const pingResult = await ping(host.address, count);
 
-    const createdPing = await Ping.create({ ...pingResult, host, userId });
+      const createdPing = await Ping.create({ ...pingResult, host, userId });
 
-    return res.json(createdPing);
-  } catch (error) {
-    throw new HttpError('Unable to create a ping for a host');
+      return res.json(createdPing);
+    } catch (error) {
+      throw new HttpError('Unable to create a ping for a host');
+    }
   }
-});
+);
 
-router.get('/hosts/:hostId/pings', async (req, res) => {
+router.get('/hosts/:hostId/pings', isAuthenticated, async (req, res) => {
   const { hostId: id } = req.params;
 
   try {
@@ -124,7 +134,7 @@ router.get('/hosts/:hostId/pings', async (req, res) => {
   }
 });
 
-router.get('/tags', async (req, res) => {
+router.get('/tags', isAuthenticated, async (req, res) => {
   try {
     const tags = await Tag.read();
 
@@ -134,7 +144,7 @@ router.get('/tags', async (req, res) => {
   }
 });
 
-router.get('/tags/:tag/hosts', async (req, res) => {
+router.get('/tags/:tag/hosts', isAuthenticated, async (req, res) => {
   const { tag } = req.params;
 
   try {
@@ -146,7 +156,7 @@ router.get('/tags/:tag/hosts', async (req, res) => {
   }
 });
 
-router.get('/pings', async (req, res) => {
+router.get('/pings', isAuthenticated, async (req, res) => {
   try {
     const pings = await Ping.read();
 
@@ -181,7 +191,21 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.get('/users/me', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const user = await User.readById(userId);
+
+    delete user.password;
+
+    return res.json(user);
+  } catch (error) {
+    throw new HTTPError('Unable to find user', 400);
+  }
+});
+
+router.delete('/users/:id', isAuthenticated, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -190,6 +214,30 @@ router.delete('/users/:id', async (req, res) => {
     return res.sendStatus(204);
   } catch (error) {
     throw new HttpError('Unable to delete a user');
+  }
+});
+
+router.post('/signin', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const { id: userId, password: hash } = await User.read({ email });
+
+    const match = await bcrypt.compare(password, hash);
+
+    if (match) {
+      const token = jwt.sign(
+        { userId },
+        process.env.JWT_SECRET,
+        { expiresIn: 3600 } // 1h
+      );
+
+      return res.json({ auth: true, token });
+    } else {
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    res.status(401).json({ error: 'User not found' });
   }
 });
 
