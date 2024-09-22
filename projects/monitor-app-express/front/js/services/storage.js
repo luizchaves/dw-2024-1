@@ -1,9 +1,11 @@
+import Auth from './auth.js';
+
 const API_URL = '/api';
 
-async function create(resource, data) {
+async function create(resource, data, auth = true) {
   resource = `${API_URL}/${resource}`;
 
-  const options = {
+  const config = {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -11,7 +13,15 @@ async function create(resource, data) {
     body: JSON.stringify(data),
   };
 
-  const res = await fetch(resource, options);
+  if (auth) {
+    config.headers.Authorization = `Bearer ${Auth.getToken()}`;
+  }
+
+  const res = await fetch(resource, config);
+
+  if (!res.ok && res.status === 401) {
+    Auth.signout();
+  }
 
   const createdData = await res.json();
 
@@ -21,23 +31,41 @@ async function create(resource, data) {
 async function read(resource) {
   resource = `${API_URL}/${resource}`;
 
-  const res = await fetch(resource);
+  const config = {
+    method: 'get',
+    headers: {
+      Authorization: `Bearer ${Auth.getToken()}`,
+    },
+  };
 
-  return await res.json();
+  const res = await fetch(resource, config);
+
+  if (!res.ok && res.status === 401) {
+    Auth.signout();
+  }
+
+  const data = await res.json();
+
+  return data;
 }
 
 async function update(resource, data) {
   resource = `${API_URL}/${resource}`;
 
-  const options = {
+  const config = {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${Auth.getToken()}`,
     },
-    method: 'put',
     body: JSON.stringify(data),
   };
 
-  const res = await fetch(resource, options);
+  const res = await fetch(resource, config);
+
+  if (!res.ok && res.status === 401) {
+    Auth.signout();
+  }
 
   const updatedData = await res.json();
 
@@ -47,11 +75,18 @@ async function update(resource, data) {
 async function remove(resource) {
   resource = `${API_URL}/${resource}`;
 
-  const options = {
-    method: 'delete',
+  const config = {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${Auth.getToken()}`,
+    },
   };
 
-  const res = await fetch(resource, options);
+  const res = await fetch(resource, config);
+
+  if (!res.ok && res.status === 401) {
+    Auth.signout();
+  }
 
   return res.ok;
 }

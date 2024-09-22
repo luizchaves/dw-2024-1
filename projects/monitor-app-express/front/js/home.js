@@ -5,15 +5,20 @@ import HostForm from './components/HostForm';
 import Modal from './components/Modal';
 import * as LineChart from './components/LineChart';
 import Hosts from './lib/hosts';
+import Auth from './services/auth.js';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
 import '../css/style.css';
 
-Hosts.load();
+window.signout = Auth.signout;
 
-HostForm.create();
+if (Auth.isAuthenticated()) {
+  Hosts.load();
 
-Modal.create();
+  HostForm.create();
 
-LineChart.create('chart-line');
+  Modal.create();
+
+  LineChart.create('chart-line');
+}
