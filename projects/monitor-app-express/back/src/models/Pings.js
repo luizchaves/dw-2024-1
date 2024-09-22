@@ -1,9 +1,11 @@
 import prisma from '../database/database.js';
 
-async function create({ icmps, stats, host }) {
-  if (!icmps || !stats || !host) {
+async function create({ packets: icmps, statistics: stats, host, userId }) {
+  if (!icmps || !stats || !host || !userId) {
     throw new Error('Error when passing parameters');
   }
+
+  const { transmitted, received } = stats;
 
   const createdPing = await prisma.ping.create({
     data: {
@@ -11,11 +13,16 @@ async function create({ icmps, stats, host }) {
         create: icmps,
       },
       stats: {
-        create: stats,
+        create: { transmitted, received },
       },
       host: {
         connect: {
           id: host.id,
+        },
+      },
+      user: {
+        connect: {
+          id: userId,
         },
       },
     },
@@ -23,6 +30,13 @@ async function create({ icmps, stats, host }) {
       icmps: true,
       stats: true,
       host: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 
@@ -36,6 +50,13 @@ async function read(where = {}) {
       icmps: true,
       stats: true,
       host: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 

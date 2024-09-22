@@ -14,7 +14,13 @@ const updatedHost = {
   tags: ['DNS', 'Cloudflare'],
 };
 
-describe('Monitor App', () => {
+const validUser = {
+  name: 'Valid',
+  email: 'valid@email.com',
+  password: '123',
+};
+
+describe('Moniotr App', () => {
   describe('Hosts Endpoints', () => {
     describe('POST /hosts', () => {
       it('should create a new host', async () => {
@@ -147,56 +153,6 @@ describe('Monitor App', () => {
     });
   });
 
-  describe('Host Ping Endpoints', () => {
-    describe('POST /hosts/:hostId/pings/:count', () => {
-      it('should create a ping with valid host', async () => {
-        let response = await request(app).post('/hosts').send(newHost);
-
-        createdHost = response.body;
-
-        response = await request(app).post(`/hosts/${createdHost.id}/pings/3`);
-
-        expect(response.statusCode).toBe(200);
-
-        expect(response.body.icmps.length).toBe(3);
-      });
-
-      it('should not create a ping with unknown ip', async () => {
-        let response = await request(app)
-          .post('/hosts')
-          .send({ name: 'unknown host', address: '172.16.0.1' });
-
-        createdHost = response.body;
-
-        response = await request(app).post(`/hosts/${createdHost.id}/pings/3`);
-
-        expect(response.statusCode).toBe(400);
-      });
-
-      it('should not create a ping with unknown domain', async () => {
-        let response = await request(app)
-          .post('/hosts')
-          .send({ name: 'unknown host', address: 'www.unknownhost.com' });
-
-        createdHost = response.body;
-
-        response = await request(app).post(`/hosts/${createdHost.id}/pings/3`);
-
-        expect(response.statusCode).toBe(400);
-      });
-    });
-
-    describe('GET /hosts/:hostId/pings', () => {
-      it('should show a ping by hostId', async () => {
-        const response = await request(app).get(
-          `/hosts/${createdHost.id}/pings`
-        );
-
-        expect(response.statusCode).toBe(200);
-      });
-    });
-  });
-
   describe('Tag Endpoints', () => {
     describe('GET /tags', () => {
       it('should show tags', async () => {
@@ -217,10 +173,115 @@ describe('Monitor App', () => {
     });
   });
 
-  describe('Ping Endpoints', () => {
-    describe('GET /pings', () => {
-      it('should show pings', async () => {
-        const response = await request(app).get(`/pings`);
+  describe('User Endpoints', () => {
+    describe('POST /users', () => {
+      it('should create a new user', async () => {
+        const response = await request(app).post('/users').send(validUser);
+
+        const userId = response.body.id;
+
+        await request(app).delete(`/users/${userId}`);
+
+        expect(response.statusCode).toBe(201);
+      });
+
+      it('should not create a new user with same email', async () => {
+        let response = await request(app).post('/users').send(validUser);
+
+        const userId = response.body.id;
+
+        response = await request(app).post('/users').send(validUser);
+
+        expect(response.statusCode).toBe(400);
+
+        await request(app).delete(`/users/${userId}`);
+      });
+
+      it('should not create a new user without email', async () => {
+        const { name, password } = validUser;
+
+        const response = await request(app)
+          .post('/users')
+          .send({ name, password });
+
+        expect(response.statusCode).toBe(400);
+      });
+    });
+  });
+
+  describe('Host Ping Endpoints', () => {
+    describe('POST /hosts/:hostId/pings/:count', () => {
+      it('should not create a ping with valid host and without user', async () => {
+        let response = await request(app).post('/hosts').send(newHost);
+
+        response = await request(app).post(
+          `/hosts/${response.body.id}/pings/3`
+        );
+
+        expect(response.statusCode).toBe(400);
+      });
+
+      it('should create a ping with valid host', async () => {
+        let response = await request(app).post('/users').send(validUser);
+
+        const userId = response.body.id;
+
+        response = await request(app).post('/hosts').send(newHost);
+
+        response = await request(app).post(
+          `/hosts/${response.body.id}/pings/3`
+        );
+
+        await request(app).delete(`/users/${userId}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.icmps.length).toBe(3);
+      });
+
+      it('should not create a ping with unknown ip', async () => {
+        let response = await request(app).post('/users').send(validUser);
+
+        const userId = response.body.id;
+
+        response = await request(app)
+          .post('/hosts')
+          .send({ name: 'unknown host', address: '172.16.0.1' });
+
+        response = await request(app).post(
+          `/hosts/${response.body.id}/pings/3`
+        );
+
+        await request(app).delete(`/users/${userId}`);
+
+        expect(response.statusCode).toBe(400);
+      });
+
+      it('should not create a ping with unknown domain', async () => {
+        let response = await request(app).post('/users').send(validUser);
+
+        const userId = response.body.id;
+
+        response = await request(app).post('/hosts').send({
+          name: 'unknown host',
+          address: 'www.unknownhost123456789xyz.com',
+        });
+
+        response = await request(app).post(
+          `/hosts/${response.body.id}/pings/3`
+        );
+
+        await request(app).delete(`/users/${userId}`);
+
+        expect(response.statusCode).toBe(400);
+      });
+    });
+
+    describe('GET /hosts/:hostId/pings', () => {
+      it('should show a ping by hostId', async () => {
+        const response = await request(app).get(
+          `/hosts/${createdHost.id}/pings`
+        );
 
         expect(response.statusCode).toBe(200);
       });

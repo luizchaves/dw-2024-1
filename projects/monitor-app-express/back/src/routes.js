@@ -2,6 +2,7 @@ import express from 'express';
 import Host from './models/Hosts.js';
 import Ping from './models/Pings.js';
 import Tag from './models/Tags.js';
+import User from './models/Users.js';
 import { ping } from './lib/ping.js';
 
 class HttpError extends Error {
@@ -97,11 +98,13 @@ router.post('/hosts/:hostId/pings/:count', async (req, res) => {
   const { hostId, count } = req.params;
 
   try {
+    const userId = (await User.read())[0].id;
+
     const host = await Host.readById(hostId);
 
     const pingResult = await ping(host.address, count);
 
-    const createdPing = await Ping.create({ ...pingResult, host });
+    const createdPing = await Ping.create({ ...pingResult, host, userId });
 
     return res.json(createdPing);
   } catch (error) {
@@ -150,6 +153,43 @@ router.get('/pings', async (req, res) => {
     return res.json(pings);
   } catch (error) {
     throw new HttpError('Unable to read pings');
+  }
+});
+
+router.post('/users', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    throw new HttpError('Error when passing parameters');
+  }
+
+  try {
+    const createdUser = await User.create({ name, email, password });
+
+    delete createdUser.password;
+
+    res.status(201).json(createdUser);
+  } catch (error) {
+    if (
+      error.message.toLowerCase().includes('unique') &&
+      error.message.toLowerCase().includes('email')
+    ) {
+      throw new HttpError('Email already in use');
+    }
+
+    throw new HttpError('Unable to create a user');
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await User.remove(id);
+
+    return res.sendStatus(204);
+  } catch (error) {
+    throw new HttpError('Unable to delete a user');
   }
 });
 

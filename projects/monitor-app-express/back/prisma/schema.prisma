@@ -15,13 +15,13 @@ datasource db {
 }
 
 model Tag {
-  id    String        @id @default(uuid())
+  id    String        @id @default(cuid())
   name  String        @unique
   hosts TagsOnHosts[]
 }
 
 model Host {
-  id      String        @id @default(uuid())
+  id      String        @id @default(cuid())
   name    String
   address String
   pings   Ping[]
@@ -38,28 +38,37 @@ model TagsOnHosts {
 }
 
 model Ping {
-  id       String   @id @default(uuid())
+  id       String   @id @default(cuid())
   createAt DateTime @default(now())
   host     Host     @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   hostId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   String
   icmps    Icmp[]
   stats    Stats?
 }
 
 model Stats {
-  id          String @id @default(uuid())
+  id          String @id @default(cuid())
   transmitted Int
   received    Int
-  time        Float
   ping        Ping   @relation(fields: [pingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   pingId      String @unique
 }
 
 model Icmp {
-  id     String @id @default(uuid())
+  id     String @id @default(cuid())
   seq    Int
   ttl    Int
   time   Float
   ping   Ping   @relation(fields: [pingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   pingId String
+}
+
+model User {
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
+  pings    Ping[]
 }

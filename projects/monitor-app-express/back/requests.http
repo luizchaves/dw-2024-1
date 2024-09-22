@@ -1,5 +1,6 @@
 @server=http://localhost:3000
 @createdHostId = {{createHost.response.body.$.id}}
+@createdUserId = {{createdUser.response.body.$.id}}
 
 ### Create a host
 # @name createHost
@@ -39,7 +40,8 @@ Content-Type: application/json
 
 {
   "name": "Cloudflare DNS",
-  "address": "1.1.1.1"
+  "address": "1.1.1.1",
+  "tags": [ "DNS", "Cloudflare"]
 }
 
 ### Update a host without name or address
@@ -64,3 +66,49 @@ DELETE {{server}}/hosts/{{createdHostId}}
 
 ### Delete a host with invalid id
 DELETE {{server}}/hosts/x
+
+### Create a ping
+POST {{server}}/hosts/{{createdHostId}}/pings/3
+
+### Read pings
+GET {{server}}/hosts/{{createdHostId}}/pings
+
+### Read tags
+GET {{server}}/tags
+
+### Read hosts by tag
+GET {{server}}/tags/dns/hosts
+
+### Read pings
+GET {{server}}/pings
+
+### Create User
+# @name createdUser
+POST {{server}}/users
+Content-Type: application/json
+
+{
+  "name": "Luiz",
+  "email": "luiz@email.com",
+  "password": "123"
+}
+
+### Create a user with same email
+POST {{server}}/users
+Content-Type: application/json
+
+{
+  "name": "Luiz",
+  "email": "luiz@email.com",
+  "password": "123"
+}
+
+### Create a user without email
+POST {{server}}/users
+Content-Type: application/json
+
+{
+  "name": "Luiz",
+  "email": "luiz@email.com",
+  "password": "123"
+}

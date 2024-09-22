@@ -11,14 +11,7 @@ export async function ping(host, count = 3) {
 
     const ping = { host, ...parse(stdout) };
 
-    return {
-      icmps: ping.packets,
-      stats: {
-        transmitted: ping.statistics.transmitted,
-        received: ping.statistics.received,
-        time: ping.packets.reduce((acc, packet) => acc + packet.time, 0),
-      },
-    };
+    return ping;
   } catch (error) {
     throw new Error('Unknown host');
   }
@@ -53,7 +46,7 @@ export function parse(output) {
   const {
     groups: { transmitted, received },
   } = output.match(regex);
-  const losted = transmitted - received;
+  const lost = transmitted - received;
 
   regex =
     /min\/avg\/max\/(stddev|mdev) = (?<min>[\d.]+)\/(?<avg>[\d.]+)\/(?<max>[\d.]+)\/(?<stddev>[\d.]+)/;
@@ -64,7 +57,7 @@ export function parse(output) {
   ping.statistics = {
     transmitted: parseInt(transmitted),
     received: parseInt(transmitted),
-    losted: losted,
+    lost: lost,
     min: parseFloat(min),
     avg: parseFloat(avg),
     max: parseFloat(max),
